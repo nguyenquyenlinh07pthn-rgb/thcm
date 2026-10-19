@@ -1,0 +1,44 @@
+import math
+
+
+def compute_entropy(labels):
+    if not labels:
+        return 0.0
+
+    total_samples = len(labels)
+    label_counts = {}
+    for label in labels:
+        label_counts[label] = label_counts.get(label, 0) + 1
+
+    entropy = 0.0
+    for count in label_counts.values():
+        probability = count / total_samples
+        entropy -= probability * math.log2(probability)
+
+    return entropy
+
+
+def compute_information_gain(parent_labels, subsets_labels):
+    # 1. Entropy tập cha
+    h_parent = compute_entropy(parent_labels)
+    total_len = len(parent_labels)
+    if total_len == 0:
+        return 0.0
+    
+    # 2. Entropy có điều kiện sau chia
+    h_children = 0.0
+    for sub in subsets_labels:
+        if len(sub) > 0:
+            weight = len(sub) / total_len
+            h_children += weight * compute_entropy(sub)
+            
+    # 3. Information Gain
+    ig = h_parent - h_children
+    return round(ig, 4)
+
+# Test case: Chia tập [Yes, Yes, No, No] thành 2 tập tinh khiết [Yes, Yes] và [No, No]
+parent = ['Yes', 'Yes', 'No', 'No']
+sub1 = ['Yes', 'Yes']
+sub2 = ['No', 'No']
+ig = compute_information_gain(parent, [sub1, sub2])
+print(f"Information Gain thu được: {ig} bits") # Kết quả kỳ vọng: 1.0 bits

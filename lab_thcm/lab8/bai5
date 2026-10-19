@@ -1,0 +1,32 @@
+def solve_constrained_l1():
+    # Ràng buộc L1: |w1| + |w2| <= 2 (Tạo ra các đỉnh nhọn trên trục tọa độ)
+    # Các đỉnh biên chính của hình thoi L1: (2, 0), (-2, 0), (0, 2), (0, -2)
+    vertices_l1 = [(2, 0), (-2, 0), (0, 2), (0, -2), (1, 1), (-1, 1)]
+    best_loss = float('inf')
+    best_w = None
+    
+    for w1, w2 in vertices_l1:
+        if abs(w1) + abs(w2) <= 2.0 + 1e-5: # Thỏa mãn ràng buộc L1
+            # Hàm Loss giả lập MSE: (w1 - 3)^2 + (w2 - 3)^2
+            loss = (w1 - 3)**2 + (w2 - 3)**2
+            if loss < best_loss:
+                best_loss = loss
+                best_w = (w1, w2)
+    return best_w, best_loss
+
+def solve_constrained_l2():
+    import math
+    # Ràng buộc L2: w1^2 + w2^2 <= 4 (Hình tròn bán kính R = 2)
+    # Điểm tiếp xúc tối ưu trên đường tròn hướng về tâm (3,3) nằm ở góc phần tư thứ nhất:
+    # w1 = 2 * (3 / sqrt(3^2 + 3^2)) = 2 * (3 / (3*sqrt(2))) = 2 / sqrt(2) = sqrt(2)
+    r = 2.0
+    w1 = r / math.sqrt(2)
+    w2 = r / math.sqrt(2)
+    loss = (w1 - 3)**2 + (w2 - 3)**2
+    return (round(w1, 3), round(w2, 3)), loss
+
+l1_point, l1_loss = solve_constrained_l1()
+l2_point, l2_loss = solve_constrained_l2()
+
+print(f"Nghiệm tối ưu Ràng buộc L1 (Lasso): {l1_point} (Điểm thưa/Sparsity nằm trên trục tọa độ)")
+print(f"Nghiệm tối ưu Ràng buộc L2 (Ridge): {l2_point} (Phân bổ đều trọng số)")

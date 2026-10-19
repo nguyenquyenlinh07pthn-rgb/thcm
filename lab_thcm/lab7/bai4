@@ -1,0 +1,79 @@
+from collections import deque
+
+
+def ford_fulkerson(capacity, source, sink):
+    residual = [row[:] for row in capacity]
+    parent = [-1] * len(residual)
+    max_flow = 0
+
+    while True:
+        parent[:] = [-1] * len(residual)
+        parent[source] = source
+        queue = deque([source])
+
+        while queue and parent[sink] == -1:
+            u = queue.popleft()
+            for v, flow in enumerate(residual[u]):
+                if flow > 0 and parent[v] == -1:
+                    parent[v] = u
+                    queue.append(v)
+
+        if parent[sink] == -1:
+            break
+
+        path_flow = float('inf')
+        v = sink
+        while v != source:
+            u = parent[v]
+            path_flow = min(path_flow, residual[u][v])
+            v = u
+
+        v = sink
+        while v != source:
+            u = parent[v]
+            residual[u][v] -= path_flow
+            residual[v][u] += path_flow
+            v = u
+
+        max_flow += path_flow
+
+    return max_flow
+
+
+def solve_bipartite_matching(L, R, candidate_edges):
+    # Ánh xạ các đỉnh về chỉ số liên tục để không phụ thuộc vào nhãn đầu vào.
+    left_index = {u: i for i, u in enumerate(L)}
+    right_index = {v: len(L) + i for i, v in enumerate(R)}
+    s = len(L) + len(R)
+    t = s + 1
+    total_nodes = t + 1
+    
+    # Khởi tạo ma trận dung lượng C kích thước 6x6
+    C = [[0] * total_nodes for _ in range(total_nodes)]
+    
+    # Nối s -> u (với u thuộc L) với dung lượng 1
+    for u in L:
+        C[s][left_index[u]] = 1
+        
+    # Nối u -> v (với u thuộc L, v thuộc R theo candidate_edges) với dung lượng 1
+    for u, v_list in candidate_edges.items():
+        for v in v_list:
+            if u in left_index and v in right_index:
+                C[left_index[u]][right_index[v]] = 1
+            
+    # Nối v -> t (với v thuộc R) với dung lượng 1
+    for v in R:
+        C[right_index[v]][t] = 1
+        
+    # Giải bài toán Max-Flow để tìm số cặp ghép tối đa
+    max_matches = ford_fulkerson(C, s, t)
+    return max_matches
+
+# Test case mẫu
+L = [0, 1]
+R = [2, 3]
+candidate_edges = {
+    0: [2, 3],
+    1: [2]
+}
+print("Số lượng cặp ghép tối đa:", solve_bipartite_matching(L, R, candidate_edges)) # Kỳ vọng: 2

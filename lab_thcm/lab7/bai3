@@ -1,0 +1,52 @@
+from collections import deque
+
+def bfs_path(residual, s, t, parent):
+    visited = set([s])
+    queue = deque([s])
+    
+    while queue:
+        u = queue.popleft()
+        for v, capacity in enumerate(residual[u]):
+            if v not in visited and capacity > 0:
+                visited.add(v)
+                parent[v] = u
+                queue.append(v)
+                if v == t:
+                    return True
+    return False
+
+def ford_fulkerson(C, s, t):
+    num_nodes = len(C)
+    residual = [row[:] for row in C]
+    parent = [-1] * num_nodes
+    max_flow = 0
+    
+    while bfs_path(residual, s, t, parent):
+        # Tìm dung lượng nghẽn (bottleneck) trên đường đi tìm được
+        path_flow = float('inf')
+        v = t
+        while v != s:
+            u = parent[v]
+            path_flow = min(path_flow, residual[u][v])
+            v = u
+            
+        # Cập nhật lại mạng thặng dư (cạnh thuận trừ, cạnh nghịch cộng)
+        v = t
+        while v != s:
+            u = parent[v]
+            residual[u][v] -= path_flow
+            residual[v][u] += path_flow
+            v = u
+            
+        max_flow += path_flow
+        
+    return max_flow
+
+# Test case mẫu
+C = [
+    [0, 10, 10, 0], # s (0)
+    [0, 0, 2, 8],   # u (1)
+    [0, 0, 0, 9],   # v (2)
+    [0, 0, 0, 0]    # t (3)
+]
+print("Luồng cực đại Max Flow:", ford_fulkerson(C, 0, 3)) # Kết quả kỳ vọng: 17

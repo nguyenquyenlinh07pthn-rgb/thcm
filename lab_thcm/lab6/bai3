@@ -1,0 +1,40 @@
+def dfs_traversal(adj_list, start_node):
+    visited = set()
+    traversal_order = []
+    
+    def dfs(u):
+        visited.add(u)
+        traversal_order.append(u)
+        for v in adj_list[u]:
+            if v not in visited:
+                dfs(v)
+                
+    dfs(start_node)
+    return traversal_order
+
+def has_cycle_undirected(adj_list, num_nodes):
+    visited = set()
+    
+    def dfs_check(u, parent):
+        visited.add(u)
+        for v in adj_list[u]:
+            if v not in visited:
+                if dfs_check(v, u):
+                    return True
+            elif v != parent:
+                # Gặp đỉnh đã thăm mà không phải nút cha -> Phát hiện chu trình
+                return True
+        return False
+
+    for node in range(num_nodes):
+        if node not in visited:
+            if dfs_check(node, -1):
+                return True
+    return False
+
+# Test case mẫu
+graph_with_cycle = {0: [1, 2], 1: [0, 2], 2: [0, 1], 3: []}
+graph_tree = {0: [1, 2], 1: [0, 3], 2: [0], 3: [1]}
+
+print("Đồ thị có chu trình (graph_with_cycle):", has_cycle_undirected(graph_with_cycle, 4)) # True
+print("Đồ thị dạng cây (graph_tree):", has_cycle_undirected(graph_tree, 4))                # False

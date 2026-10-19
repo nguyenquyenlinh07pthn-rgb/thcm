@@ -1,0 +1,32 @@
+from collections import deque
+
+
+def count_and_find_components(adj_list, num_nodes):
+    visited = set()
+    components = []
+    
+    for i in range(num_nodes):
+        if i not in visited:
+            # BFS để loang toàn bộ các đỉnh trong cùng một thành phần liên thông
+            current_component = []
+            queue = deque([i])
+            visited.add(i)
+            
+            while queue:
+                u = queue.popleft()
+                current_component.append(u)
+                for v in adj_list[u]:
+                    if v not in visited:
+                        visited.add(v)
+                        queue.append(v)
+                        
+            components.append(current_component)
+            
+    return len(components), components
+
+# Test case mẫu
+discrete_graph = {0: [1], 1: [0], 2: [3, 4], 3: [2, 4], 4: [2, 3]}
+num_comp, comps = count_and_find_components(discrete_graph, 5)
+
+print("Số thành phần liên thông:", num_comp)
+print("Danh sách cụm:", comps)

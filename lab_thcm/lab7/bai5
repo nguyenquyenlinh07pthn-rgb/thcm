@@ -1,0 +1,35 @@
+def compute_pagerank(P_web, damping_factor=0.85, max_iter=100, tol=1e-6):
+    n = len(P_web)
+    # Phân phối xác suất ban đầu đều nhau cho các server
+    pr = [1.0 / n] * n
+    
+    for _ in range(max_iter):
+        new_pr = [0.0] * n
+        for j in range(n):
+            # Tính tổng xác suất từ các node khác trỏ tới j
+            incoming_sum = 0.0
+            for i in range(n):
+                incoming_sum += pr[i] * P_web[i][j]
+            # Công thức PageRank kết hợp Random Walk (Damping Factor)
+            new_pr[j] = (1 - damping_factor) / n + damping_factor * incoming_sum
+            
+        # Kiểm tra điều kiện hội tụ
+        if sum(abs(new_pr[i] - pr[i]) for i in range(n)) < tol:
+            break
+        pr = new_pr
+        
+    return [round(val, 4) for val in pr]
+
+# Ma trận liên kết chuyển đổi giữa các Server (PageRank Transition Matrix)
+P_web = [
+    [0.0, 0.5, 0.5, 0.0], # A liên kết đến B, C
+    [0.0, 0.0, 1.0, 0.0], # B liên kết đến C
+    [1.0, 0.0, 0.0, 0.0], # C liên kết đến A
+    [0.0, 0.5, 0.5, 0.0]  # D liên kết đến B, C
+]
+
+pagerank_scores = compute_pagerank(P_web)
+server_names = ['Server A', 'Server B', 'Server C', 'Server D']
+print("Điểm số uy tín PageRank của các Server:")
+for name, score in zip(server_names, pagerank_scores):
+    print(f"- {name}: {score}")

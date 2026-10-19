@@ -1,0 +1,26 @@
+def gradient_descent_1d(initial_w, learning_rate, epochs):
+    w = initial_w
+    loss_history = []
+    
+    for epoch in range(epochs):
+        # Tính Loss: L(w) = w^2 - 4*w + 4
+        loss = w**2 - 4*w + 4
+        loss_history.append(loss)
+        
+        # Đạo hàm: L'(w) = 2*w - 4
+        grad = 2*w - 4
+        
+        # Cập nhật trọng số w
+        w = w - learning_rate * grad
+        
+    return w, loss_history
+
+# Test case mẫu
+w_init = 10.0
+lr = 0.1
+epochs = 20
+optimal_w, history = gradient_descent_1d(w_init, lr, epochs)
+
+print(f"Trọng số tối ưu w* sau {epochs} epochs: {optimal_w:.4f}")
+print(f"Loss cuối cùng: {history[-1]:.6f}")
+# Kết quả kỳ vọng: w hội tụ về 2.0 (Loss hội tụ về 0.0)

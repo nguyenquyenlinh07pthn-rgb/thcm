@@ -1,0 +1,28 @@
+def build_graph_representations(num_nodes, edges):
+    # 1. Khởi tạo
+    adj_matrix = [[0] * num_nodes for _ in range(num_nodes)]
+    adj_list = {i: [] for i in range(num_nodes)}
+    
+    # 2. Điền thông tin cạnh
+    for u, v in edges:
+        # Ma trận kề (đối xứng cho đồ thị vô hướng)
+        adj_matrix[u][v] = 1
+        adj_matrix[v][u] = 1
+        
+        # Danh sách kề
+        adj_list[u].append(v)
+        adj_list[v].append(u)
+        
+    return adj_matrix, adj_list
+
+# Chạy thử nghiệm
+num_nodes = 4
+edges = [(0, 1), (0, 2), (1, 2), (2, 3)]
+matrix, adj_list = build_graph_representations(num_nodes, edges)
+
+print("Ma trận kề (Adjacency Matrix):")
+for row in matrix:
+    print(row)
+    
+print("Danh sách kề (Adjacency List):")
+print(adj_list)

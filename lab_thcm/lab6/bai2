@@ -1,0 +1,26 @@
+from collections import deque
+
+def bfs_shortest_path(adj_list, start_node):
+    visited = set([start_node])
+    dist = {start_node: 0}
+    queue = deque([start_node])
+    traversal_order = []
+    
+    while queue:
+        u = queue.popleft()
+        traversal_order.append(u)
+        
+        # Duyệt qua các hàng xóm
+        for v in adj_list[u]:
+            if v not in visited:
+                visited.add(v)
+                dist[v] = dist[u] + 1
+                queue.append(v)
+                
+    return traversal_order, dist
+
+# Test case
+graph = {0: [1, 2], 1: [0, 3], 2: [0], 3: [1]}
+order, distances = bfs_shortest_path(graph, 0)
+print("Thứ tự duyệt BFS:", order)
+print("Khoảng cách từ đỉnh 0:", distances)

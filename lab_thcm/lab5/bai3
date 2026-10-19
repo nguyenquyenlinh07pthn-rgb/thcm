@@ -1,0 +1,41 @@
+def naive_bayes_predict(dataset, x_new):
+    total = len(dataset)
+    classes = {}
+    
+    # Tách dữ liệu theo nhãn
+    for x, y in dataset:
+        if y not in classes:
+            classes[y] = []
+        classes[y].append(x)
+        
+    scores = {}
+    for y, samples in classes.items():
+        prior = len(samples) / total
+        likelihood = 1.0
+        num_features = len(x_new)
+        
+        for i in range(num_features):
+            # Đếm số mẫu trong lớp y có đặc trưng khớp với x_new[i]
+            count_feature = sum(1 for sample in samples if sample[i] == x_new[i])
+            vocab_feature_size = 2 # Đặc trưng nhị phân {0, 1}
+            # Áp dụng làm mượt Laplace
+            p_feature = (count_feature + 1) / (len(samples) + vocab_feature_size)
+            likelihood *= p_feature
+            
+        scores[y] = prior * likelihood
+        
+    # Trả về nhãn có điểm xác suất hậu phương cao hơn
+    predicted_label = max(scores, key=scores.get)
+    return predicted_label
+
+# Test case
+dataset = [
+    ([1, 1], 1),
+    ([1, 0], 1),
+    ([1, 1], 1),
+    ([0, 1], 0),
+    ([0, 0], 0),
+    ([0, 0], 0)
+]
+x_new = [1, 0]
+print(f"Dự đoán nhãn cho x_new {x_new}: {naive_bayes_predict(dataset, x_new)}") # Kỳ vọng: 1 (Spam)

@@ -1,0 +1,19 @@
+import math
+
+def binary_cross_entropy(y_true, y_pred, eps=1e-15):
+    # Kẹp y_pred trong khoảng [eps, 1 - eps] để tránh lỗi log(0)
+    y_pred = max(eps, min(1.0 - eps, y_pred))
+    loss = -(y_true * math.log(y_pred) + (1 - y_true) * math.log(1 - y_pred))
+    return loss
+
+def laplace_smoothing(count_word, count_class, vocab_size, alpha=1.0):
+    p = (count_word + alpha) / (count_class + alpha * vocab_size)
+    return p
+
+# Test Loss
+print(f"Loss khi dự đoán chuẩn (y=1, p=0.9): {binary_cross_entropy(1, 0.9):.4f}") # Thấp (~0.1054)
+print(f"Loss khi dự đoán sai (y=1, p=0.1): {binary_cross_entropy(1, 0.1):.4f}")  # Rất cao (~2.3026)
+
+# Test Laplace: từ chưa xuất hiện (count=0)
+p_smoothed = laplace_smoothing(count_word=0, count_class=100, vocab_size=500, alpha=1.0)
+print(f"Xác suất sau làm mượt: {p_smoothed:.4f}") # ~0.0017 (khác 0)

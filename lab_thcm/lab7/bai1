@@ -1,0 +1,22 @@
+def simulate_markov_chain(P, pi_0, num_steps=50):
+    n = len(pi_0)
+    pi = list(pi_0)
+    
+    for _ in range(num_steps):
+        # Tính pi_next = pi * P
+        pi_next = [0.0] * n
+        for j in range(n):
+            pi_next[j] = sum(pi[i] * P[i][j] for i in range(n))
+        pi = pi_next
+        
+    return [round(val, 4) for val in pi]
+
+# Chạy thử nghiệm
+P = [
+    [0.8, 0.2], # Nắng
+    [0.4, 0.6]  # Mưa
+]
+pi_0 = [1.0, 0.0]
+pi_star = simulate_markov_chain(P, pi_0, 50)
+print("Phân phối xác suất Trạng thái dừng pi* (Nắng, Mưa):", pi_star)
+# Kết quả kỳ vọng: [0.6667, 0.3333] (Tỷ lệ xấp xỉ 2/3 Nắng, 1/3 Mưa)

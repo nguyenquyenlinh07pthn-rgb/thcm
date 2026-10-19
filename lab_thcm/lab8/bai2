@@ -1,0 +1,26 @@
+def convert_to_standard_form(c, A_ub, b_ub):
+    m = len(A_ub) # Số ràng buộc
+    n = len(c)    # Số biến gốc
+    
+    # 1. Hàm mục tiêu chuẩn: min(-c^T * x + 0*s)
+    c_std = [-val for val in c] + [0.0] * m
+    
+    # 2. Ma trận A_eq mở rộng với ma trận đơn vị I_m
+    A_eq = []
+    for i in range(m):
+        slack_row = [1.0 if j == i else 0.0 for j in range(m)]
+        A_eq.append(A_ub[i] + slack_row)
+        
+    b_eq = list(b_ub)
+    return c_std, A_eq, b_eq
+
+# Test case
+c = [40, 30]
+A_ub = [[2, 1], [1, 1]]
+b_ub = [100, 80]
+
+c_std, A_eq, b_eq = convert_to_standard_form(c, A_ub, b_ub)
+print("Hàm mục tiêu c_std:", c_std) # [-40, -30, 0.0, 0.0]
+print("Ma trận A_eq:")
+for row in A_eq:
+    print(row) # [[2, 1, 1.0, 0.0], [1, 1, 0.0, 1.0]]

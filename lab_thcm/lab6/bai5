@@ -1,0 +1,50 @@
+from collections import deque
+
+def flood_fill_bfs(image, start_row, start_col, new_color):
+    if not image or not image[0]:
+        return image
+        
+    M = len(image)
+    N = len(image[0])
+    old_color = image[start_row][start_col]
+    
+    # Xử lý điều kiện biên: nếu màu mới trùng màu cũ thì giữ nguyên tránh lặp vô hạn
+    if old_color == new_color:
+        return image
+        
+    queue = deque([(start_row, start_col)])
+    image[start_row][start_col] = new_color
+    
+    # 4 hướng dịch chuyển: Trên, Dưới, Trái, Phải
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    
+    while queue:
+        r, c = queue.popleft()
+        
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            # Kiểm tra biên ma trận và kiểm tra xem pixel lân cận có cùng màu ban đầu không
+            if 0 <= nr < M and 0 <= nc < N and image[nr][nc] == old_color:
+                image[nr][nc] = new_color
+                queue.append((nr, nc))
+                
+    return image
+
+# Test case mẫu
+image = [
+    [1, 1, 1, 0, 0],
+    [1, 1, 0, 0, 2],
+    [1, 0, 0, 2, 2],
+    [0, 0, 2, 2, 2]
+]
+
+print("Ảnh trước khi Flood Fill:")
+for row in image:
+    print(row)
+
+# Thực hiện loang màu tại tọa độ (0, 0) sang màu mới là 5
+flood_fill_bfs(image, 0, 0, 5)
+
+print("\nẢnh sau khi Flood Fill (đổi cụm số 1 thành số 5):")
+for row in image:
+    print(row)

@@ -1,0 +1,27 @@
+import math
+
+def compute_entropy(labels):
+    if not labels:
+        return 0.0
+    total_samples = len(labels)
+    
+    # 1. Đếm tần suất nhãn
+    label_counts = {}
+    for label in labels:
+        label_counts[label] = label_counts.get(label, 0) + 1
+        
+    # 2. Tính Entropy
+    entropy = 0.0
+    for count in label_counts.values():
+        p = count / total_samples
+        if p > 0:
+            entropy -= p * math.log2(p)
+            
+    return round(entropy, 4)
+
+# Chạy thử nghiệm
+labels_mixed = ['Yes', 'Yes', 'No', 'Yes', 'No'] # 3 Yes, 2 No
+labels_pure = ['Yes', 'Yes', 'Yes']             # Tinh khiết
+
+print(f"Entropy tập hỗn loạn (3 Yes, 2 No): {compute_entropy(labels_mixed)} bits")
+print(f"Entropy tập tinh khiết (100% Yes): {compute_entropy(labels_pure)} bits")

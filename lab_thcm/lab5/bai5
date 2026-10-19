@@ -1,0 +1,88 @@
+import math
+
+
+train_emails = [
+    (["free", "money", "offer"], 1),
+    (["free", "ticket", "win"], 1),
+    (["money", "bonus", "free"], 1),
+    (["meeting", "project", "deadline"], 0),
+    (["project", "report", "review"], 0),
+    (["schedule", "meeting", "room"], 0)
+]
+
+def extract_vocabulary(emails):
+    vocab = set()
+    for words, label in emails:
+        for word in words:
+            vocab.add(word)
+    return sorted(list(vocab))
+
+def train_naive_bayes(train_emails, alpha=1.0):
+    vocab = extract_vocabulary(train_emails)
+    vocab_size = len(vocab)
+    
+    total_emails = len(train_emails)
+    spam_emails = [words for words, label in train_emails if label == 1]
+    ham_emails = [words for words, label in train_emails if label == 0]
+    
+    p_spam = len(spam_emails) / total_emails
+    p_ham = len(ham_emails) / total_emails
+    
+    spam_word_counts = {}
+    ham_word_counts = {}
+    
+    total_spam_words = 0
+    for words in spam_emails:
+        for word in words:
+            spam_word_counts[word] = spam_word_counts.get(word, 0) + 1
+            total_spam_words += 1
+            
+    total_ham_words = 0
+    for words in ham_emails:
+        for word in words:
+            ham_word_counts[word] = ham_word_counts.get(word, 0) + 1
+            total_ham_words += 1
+            
+    spam_word_probs = {}
+    ham_word_probs = {}
+    
+    for word in vocab:
+        count_spam = spam_word_counts.get(word, 0)
+        spam_word_probs[word] = (count_spam + alpha) / (total_spam_words + alpha * vocab_size)
+        
+        count_ham = ham_word_counts.get(word, 0)
+        ham_word_probs[word] = (count_ham + alpha) / (total_ham_words + alpha * vocab_size)
+        
+    model = {
+        'vocab': vocab,
+        'p_spam': p_spam,
+        'p_ham': p_ham,
+        'spam_word_probs': spam_word_probs,
+        'ham_word_probs': ham_word_probs
+    }
+    return model
+
+def predict_email(email_words, model):
+    vocab = model['vocab']
+    # Sử dụng Log-Likelihood để tránh Underflow
+    log_p_spam = math.log(model['p_spam'])
+    log_p_ham = math.log(model['p_ham'])
+    
+    for word in email_words:
+        if word in vocab:
+            log_p_spam += math.log(model['spam_word_probs'][word])
+            log_p_ham += math.log(model['ham_word_probs'][word])
+            
+    if log_p_spam > log_p_ham:
+        return 1, log_p_spam, log_p_ham
+    else:
+        return 0, log_p_spam, log_p_ham
+
+# Chạy thử nghiệm phân loại email mới
+model = train_naive_bayes(train_emails, alpha=1.0)
+test_email = ['free', 'project', 'bonus']
+pred_label, log_spam, log_ham = predict_email(test_email, model)
+
+print(f"Từ điển V: {model['vocab']}")
+print(f"Dự đoán email {test_email}: Nhãn {'Spam (1)' if pred_label == 1 else 'Ham (0)'}")
+print(f"Log-Likelihood Spam: {log_spam:.4f} | Log-Likelihood Ham: {log_ham:.4f}")

@@ -1,0 +1,31 @@
+from collections import deque
+
+def is_bipartite_bfs(adj_list, num_nodes):
+    color = {} # Lưu màu của từng đỉnh: 0 hoặc 1
+    
+    for start in range(num_nodes):
+        if start in color:
+            continue
+            
+        queue = deque([start])
+        color[start] = 0
+        
+        while queue:
+            u = queue.popleft()
+            
+            for v in adj_list[u]:
+                if v not in color:
+                    color[v] = 1 - color[u]  # Tô màu đối lập với u
+                    queue.append(v)
+                elif color[v] == color[u]:
+                    return False  # Xung đột màu -> Không phải đồ thị hai phía
+                    
+    return True
+
+# Test case 1: Chu trình 4 đỉnh (độ dài chẵn) -> Hai phía
+g_even = {0: [1, 3], 1: [0, 2], 2: [1, 3], 3: [0, 2]}
+print("g_even là đồ thị hai phía:", is_bipartite_bfs(g_even, 4)) # True
+
+# Test case 2: Chu trình 3 đỉnh (tam giác lẻ) -> Không phải hai phía
+g_odd = {0: [1, 2], 1: [0, 2], 2: [0, 1]}
+print("g_odd là đồ thị hai phía:", is_bipartite_bfs(g_odd, 3)) # False
